@@ -1,44 +1,48 @@
 #include <bits/stdc++.h>
+using namespace std;
 
-int power(int a, int e) {
-    if (e == 0) return 1;
-    return e == 1 ? a : a * power(a, e-1);
-}
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-void answer(int a, int b) {
-    std::cout << a << " + " << b << " = " << a+b << std::endl;
-}
-
-int main() {
-    using ll = long long;
-    
-    int t;
-    std::cin >> t;
-    while (t--) {
-
-        int a, b, c;
-        ll k;
-        std::cin >> a >> b >> c >> k;
-        
-        bool good = false;
-    
-        for (int i = power(10, a-1); i < power(10, a); ++i) {
-            int left = std::max(power(10, b-1), power(10, c-1) - i);
-            int right = std::min(power(10, b)-1, power(10, c) - 1 - i);
-            if (left > right) continue;
-    
-            int have = right - left + 1;
-            if (k <= have) {
-                answer(i, left + k - 1);
-                good = true;
-                break;
-            }
-    
-            k -= have;
-        }
-    
-        if (!good) std::cout << "-1" << std::endl;
+    int N;
+    cin >> N;
+    vector<int> A(N), B(N);
+    for(int i = 0; i < N; i++){
+        cin >> A[i];
     }
+    for(int i = 0; i < N; i++){
+        cin >> B[i];
+    }
+
+    // pos[val] = position of val in A (0-based)
+    vector<int> pos(N+1);
+    for(int i = 0; i < N; i++){
+        pos[A[i]] = i;
+    }
+
+    // build the sequence C of positions of B's elements in A
+    vector<int> C(N);
+    for(int i = 0; i < N; i++){
+        C[i] = pos[B[i]];
+    }
+
+    // compute length of LIS on C
+    // classic patience‐sorting in O(N log N)
+    vector<int> tail;
+    tail.reserve(N);
+    for(int x : C){
+        auto it = lower_bound(tail.begin(), tail.end(), x);
+        if(it == tail.end())
+            tail.push_back(x);
+        else
+            *it = x;
+    }
+    int L = tail.size();
+
+    // total deletions = (N - L) from A + (N - L) from B
+    long long ans = 2LL * (N - L);
+    cout << ans << "\n";
 
     return 0;
 }

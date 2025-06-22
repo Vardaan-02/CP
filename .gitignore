@@ -1,0 +1,49 @@
+# === Compiled binaries ===
+*.out
+*.exe
+*.elf
+
+# === Object files ===
+*.o
+*.obj
+
+# === Temp / Backup files ===
+*.log
+*.tmp
+*~
+*.bak
+*.swp
+*.swo
+
+# === Debugger dumps ===
+*.stackdump
+*.core
+*.trace
+*.dSYM/
+
+# === Input / Output files for testing ===
+*.in
+*.out.txt
+input.txt
+output.txt
+testcases.txt
+
+# === Cache / Compilation folders ===
+build/
+bin/
+*.gch
+*.pch
+
+# === Editor/IDE junk ===
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+
+# === OS-specific files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.cph
