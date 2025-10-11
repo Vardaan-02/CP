@@ -17,10 +17,26 @@ const int N = 2*1e5+10;
 void precalc(){}
 
 void solve(){
-    int n;
-    cin >> n;
-    vector<int> v(n);
-    vin(v);
+    int a,b,c,d;
+    cin >> a >> b >> c >> d;
+    if(a<c){
+        while(a<c && b>=5){
+            if(a-c==b-d) r("YES")
+            b -= 5;
+            a++;
+        }
+        if(a-c == b-d && a>=c && b>=d) r("YES")
+        else r("NO")
+    }
+    else{
+        while(c<a && a>0){
+            if(a-c==b-d) r("YES")
+            b += 5;
+            a--;
+        }
+        if(a-c == b-d && a>=c && b>=d) r("YES")
+        else r("NO")
+    }
 }
 
 int32_t main(){
