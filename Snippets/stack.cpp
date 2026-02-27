@@ -20,10 +20,11 @@ const int N = 1e5+10;
 void precalc(){}
 
     vector<int> nextGreaterElement(vector<int>& v){
+        int n = v.size();
         stack<int> st;
-        vector<int> ans(v.size(),v.size());
-        for(int i=0 ; i<v.size() ;i++){
-            while(!st.empty() && v[st.top()]<v[i]){
+        vector<int> ans(n, n);
+        for(int i = 0 ; i < n ; i++){
+            while(!st.empty() && v[st.top()] < v[i]){
                 ans[st.top()] = i;
                 st.pop();
             }
@@ -35,8 +36,8 @@ void precalc(){}
     vector<int> nextSmallerElement(vector<int>& v){
         stack<int> st;
         vector<int> ans(v.size(),-1);
-        for(int i=0 ; i<v.size() ;i++){
-            while(!st.empty() && v[st.top()]>v[i]){
+        for(int i = 0 ; i < v.size() ; i++){
+            while(!st.empty() && v[st.top()] > v[i]){
                 ans[st.top()] = i;
                 st.pop();
             }
@@ -48,11 +49,9 @@ void precalc(){}
     vector<int> prevGreaterElement(vector<int>& v){
         stack<int> st;
         vector<int> ans(v.size(),-1);
-        for(int i=0 ; i<v.size() ; i++){
-            while(!st.empty() && v[st.top()]<v[i]){
-                st.pop();
-            }
-            if(!st.empty()) ans[i]=st.top();
+        for(int i = 0 ; i < v.size() ; i++){
+            while(!st.empty() && v[st.top()] < v[i]) st.pop();
+            if(!st.empty()) ans[i] = st.top();
             st.push(i);
         }
         return ans;
@@ -61,10 +60,8 @@ void precalc(){}
     vector<int> prevSmallerElement(vector<int>& v){
         stack<int> st;
         vector<int> ans(v.size(),-1);
-        for(int i=0 ; i<v.size() ; i++){
-            while(!st.empty() && v[st.top()]>v[i]){
-                st.pop();
-            }
+        for(int i = 0 ; i < v.size() ; i++){
+            while(!st.empty() && v[st.top()] > v[i]) st.pop();
             if(!st.empty()) ans[i]=st.top();
             st.push(i);
         }

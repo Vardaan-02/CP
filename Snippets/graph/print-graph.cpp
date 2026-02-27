@@ -25,7 +25,7 @@ void printGraph(int n,map<int,vector<int>>& adjList){
     }
 }
 
-void printGraphWithWeights(int n,map<int,vector<pair<int,int>>>& adjList){
+void printGraphWithWeights(int n,vector<vector<pair<int,int>>>& adjList){
     for(int i=0 ; i<n ; i++){
         cout << i << " " << "{ ";
         for(auto j:adjList[i]){

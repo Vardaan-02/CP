@@ -6,83 +6,115 @@ using namespace std;
 #define vout(a) for (int i = 0; i < (a).size(); i++) cout << a[i] << ' '; cout << endl;
 #define r(x) { cout << x << '\n'; return; }
 
-class SegmentTree{
-public:
-    vector<int> tree;
-    vector<int> lazy;
-
-    SegmentTree(int n,vector<int>& v){
-        tree.resize(4*n+1);
-        lazy.resize(4*n+1);
-        for (int i = 0 ; i < 4*n + 1 ; i++) lazy[i] = 0;
-        build(0, n-1, v, 0);
-    }
-
-
-    void build(int s,int e,vector<int>& v,int index){
-        if (s == e){tree[index] = v[s]; return;}
-
-        int left = 2*index + 1;
-        int right = 2*index + 2;
-
-        int mid = (s+e)/2 ;
-        build(s, mid, v, left);
-        build(mid+1, e, v, right);
-
-        tree[index] = min(tree[left], tree[right]);
-    }
-
-    int query(int l,int r,int s,int e,int index){
-        int left = 2*index + 1;
-        int right = 2*index + 2;
-
-        if(lazy[index]!=0){
-            tree[index] += lazy[index];
-            if(s != e){
-                lazy[left] += lazy[index];
-                lazy[right] += lazy[index];
-            }
-            lazy[index] = 0;
+template<typename Node, typename Update>
+struct SegmentTree {
+    vector<Node> tree;
+    vector<bool> lazy;
+    vector<Update> updates;
+    vector<int> arr; // type may change
+    int n;
+    int s;
+    SegmentTree(vector<int> &a) { // change if type updated
+        arr = a;
+        n = a.size();
+        s = 1;
+        while(s < 2 * n){
+            s = s << 1;
         }
-
-        if(s >= l && e <= r) return tree[index];
-        if(s > r || e < l) return LLONG_MAX;
-
-        int mid = (s+e)/2 ;
-        int left_contribution = query(l, r, s, mid, left);
-        int right_contribution = query(l, r, mid+1, e, right);
-
-        return min(left_contribution, right_contribution);
+        tree.resize(s); fill(tree.begin(), tree.end(), Node());
+        lazy.resize(s); fill(lazy.begin(), lazy.end(), false);
+        updates.resize(s); fill(updates.begin(), updates.end(), Update());
+        build(0, n - 1, 1);
     }
-
-    void update(int s,int e,int index, int l,int r,int val){
-        int left = 2*index + 1;
-        int right = 2*index + 2;
-
-        if(lazy[index]!=0){
-            tree[index] += lazy[index];
-            if(s != e){
-                lazy[left] += lazy[index];
-                lazy[right] += lazy[index];
-            }
-            lazy[index] = 0;
-        }
-
-        if (s > r || e < l) return;
-        if (s >= l && e <= r) {
-            tree[index] += val; 
-            if(s != e){
-                lazy[left] += val;
-                lazy[right] += val;
-            } 
+    void build(int start, int end, int index) { // Never change this
+        if (start == end)   {
+            tree[index] = Node(arr[start]);
             return;
         }
-        
-        int mid = (s+e)/2;
-        update(s, mid, left, l, r, val);
-        update(mid+1, e, right, l, r, val);
+        int mid = (start + end) / 2;
+        build(start, mid, 2 * index);
+        build(mid + 1, end, 2 * index + 1);
+        tree[index].merge(tree[2 * index], tree[2 * index + 1]);
+    }
+    void pushdown(int index, int start, int end){
+        if(lazy[index]){
+            int mid = (start + end) / 2;
+            apply(2 * index, start, mid, updates[index]);
+            apply(2 * index + 1, mid + 1, end, updates[index]);
+            updates[index] = Update();
+            lazy[index] = 0;
+        }
+    }
+    void apply(int index, int start, int end, Update& u){
+        if(start != end){
+            lazy[index] = 1;
+            updates[index].combine(u, start, end);
+        }
+        u.apply(tree[index], start, end);
+    }
+    void update(int start, int end, int index, int left, int right, Update& u) {  // Never Change this
+        if(start > right || end < left)
+            return;
+        if(start >= left && end <= right){
+            apply(index, start, end, u);
+            return;
+        }
+        pushdown(index, start, end);
+        int mid = (start + end) / 2;
+        update(start, mid, 2 * index, left, right, u);
+        update(mid + 1, end, 2 * index + 1, left, right, u);
+        tree[index].merge(tree[2 * index], tree[2 * index + 1]);
+    }
+    Node query(int start, int end, int index, int left, int right) { // Never change this
+        if (start > right || end < left)
+            return Node();
+        if (start >= left && end <= right){
+            pushdown(index, start, end);
+            return tree[index];
+        }
+        pushdown(index, start, end);
+        int mid = (start + end) / 2;
+        Node l, r, ans;
+        l = query(start, mid, 2 * index, left, right);
+        r = query(mid + 1, end, 2 * index + 1, left, right);
+        ans.merge(l, r);
+        return ans;
+    }
+    void make_update(int left, int right, int val) {  // pass in as many parameters as required
+        Update new_update = Update(val); // may change
+        update(0, n - 1, 1, left, right, new_update);
+    }
+    Node make_query(int left, int right) {
+        return query(0, n - 1, 1, left, right);
+    }
+};
 
-        tree[index] = min(tree[left], tree[right]);
+struct Node1 {
+    int val; // may change
+    Node1() { // Identity element
+        val = 0;    // may change
+    }
+    Node1(int p1) {  // Actual Node
+        val = p1; // may change
+    }
+    void merge(Node1 &l, Node1 &r) { // Merge two child nodes
+        val = l.val + r.val;  // may change
+    }
+};
+
+struct Update1 {
+    int val; // may change
+    Update1(){ // Identity update
+        val = 0;
+    }
+    Update1(int val1) { // Actual Update
+        val = val1;
+    }
+    void apply(Node1 &a, int start, int end) { // apply update to given node
+        a.val = val * (end - start + 1); // may change
+    }
+    void combine(Update1& new_update, int start, int end){
+        val = new_update.val;
     }
 };
 

@@ -2,68 +2,56 @@
 using namespace std;
 
 #define int long long
-#define vin(a) for (int i = 0; i < (a).size(); i++) cin >> a[i];
-#define vout(a) for (int i = 0; i < (a).size(); i++) cout << a[i] << ' '; cout << endl;
-#define r(sum) { cout << sum << '\n'; return; }
 
-void solve() {
-    int n, k;
-    cin >> n >> k;
-    vector<int> v(n);
-    vin(v);
-    if(k==1) r("YES")
-    vector<int> a = v;
-    sort(a.begin(),a.end());
-    vector<int> even;
-    vector<int> odd;
-    for(int i = 0 ; i < k ; i++) even.push_back(a[i]);
-    for(int i = 0 ; i < k ; i++) odd.push_back(a[i]);
-    if(k&1) even.pop_back();
-    else odd.pop_back();
-    int even_size = even.size();
-    int odd_size = odd.size();
-    bool even_possible = true;
-    bool odd_possible = true;
-    bool shift = true;
-    for (int i = 0 ; i < even_size-1 ; i += 2) if(even[i]!=even[i+1]) even_possible = false;
-    for (int i = 0 ; i < even_size-1 ; ){
-        if(odd[i]!=odd[i+1] && shift){ shift = false; i+=1;}
-        else if(odd[i]!=odd[i+1]){odd_possible = false; break;}
-        else i+=2;
-    }
-    if(even_possible){
-        int s = 0;
-        int e = even_size;
-        stack<int> st;
-        map<int,int> m;
-        int count = 0;
-        for(int i = 0 ; i < even_size ; i+=2){
-            m[even[i]]++;
-            count++;
-        }
-        for (int i = 0 ; i < n ; i++){
-            if(m[v[i]] && count){
-                m[v[i]]--;
-                count--;
-                st.push(v[i]);
-            }
-            else if(!count && st.top()==v[i]){
-                st.pop();
-            }
-        }
-        if(st.empty()) r("YES")
-    }
-    if(odd_possible){
-        cout << "odd_possible : " << odd_possible << endl;
+string s;
+int ans = 0;
+
+bool vis[7][7];
+
+void dfs(int x, int y, int idx) {
+
+    // If reached destination
+    if (x == 6 && y == 0) {
+        if (idx == 48) ans++;
         return;
     }
-    r("NO")
+
+    // If all moves finished but not at destination
+    if (idx == 48) return;
+
+    // Corridor pruning (critical)
+    if ((x == 0 || vis[x-1][y]) && (x == 6 || vis[x+1][y]) &&
+        (y > 0 && !vis[x][y-1]) && (y < 6 && !vis[x][y+1])) return;
+
+    if ((y == 0 || vis[x][y-1]) && (y == 6 || vis[x][y+1]) &&
+        (x > 0 && !vis[x-1][y]) && (x < 6 && !vis[x+1][y])) return;
+
+    vis[x][y] = true;
+
+    char c = s[idx];
+
+    if ((c == '?' || c == 'U') && x > 0 && !vis[x-1][y])
+        dfs(x-1, y, idx+1);
+
+    if ((c == '?' || c == 'D') && x < 6 && !vis[x+1][y])
+        dfs(x+1, y, idx+1);
+
+    if ((c == '?' || c == 'L') && y > 0 && !vis[x][y-1])
+        dfs(x, y-1, idx+1);
+
+    if ((c == '?' || c == 'R') && y < 6 && !vis[x][y+1])
+        dfs(x, y+1, idx+1);
+
+    vis[x][y] = false;
 }
 
 int32_t main() {
-    ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0);
-    int t = 1;
-    cin >> t;
-    while (t--) solve();
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    cin >> s;
+    dfs(0, 0, 0);
+
+    cout << ans << "\n";
     return 0;
 }

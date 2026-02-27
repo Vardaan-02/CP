@@ -23,6 +23,14 @@ int power(int a,int b){
 	return ans;
 }
 
+int nCr(int n, int r) {
+    if (r < 0 || r > n) return 0;
+    r = min(r, n - r);
+    int res = 1;
+    for (int i = 1; i <= r; i++) res = res * (n-r+i)/i;
+    return res;
+}
+
 void precalc(){}
 
 void solve(){

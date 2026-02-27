@@ -1,53 +1,43 @@
 #include <bits/stdc++.h>
-
 using namespace std;
+ 
+#define int long long
+#define vin(a) for (int i = 0; i < (a).size(); i++) cin >> a[i];
+#define vout(a) for (int i = 0; i < (a).size(); i++) cout << a[i] << ' '; cout << endl;
+#define r(x) { cout << x << '\n'; return; }
+ 
+const int M = 1e9 + 7;
+const int INF = 1e18;
 
-#define int long long int
-#define double long double
-#define INT_MAX LLONG_MAX
-#define INT_MIN LLONG_MIN
-#define vin(a) for(int i=0;i<(a).size();i++)cin>>a[i];
-#define vout(a) for(int i=0;i<a.size();i++)cout<<a[i]<<' ';cout<<endl;
-#define cout(x) cout<<setprecision(20)<<x<<endl 
-#define r(x) {cout<<x<<'\n';return;}
+int f(int s, int e, vector<int>& v, vector<vector<int>>& dp){
+    if (s > e) return 0;
 
-const int M = 998244353;
-const int N = 2*1e5+10;
+    if (dp[s][e] != -1) return dp[s][e];
 
-void precalc(){}
+    int mx_index = max_element(v.begin() + s, v.begin() + e + 1) - v.begin();
 
-void solve(){
-    int a,b,c,d;
-    cin >> a >> b >> c >> d;
-    if(a<c){
-        while(a<c && b>=5){
-            if(a-c==b-d) r("YES")
-            b -= 5;
-            a++;
-        }
-        if(a-c == b-d && a>=c && b>=d) r("YES")
-        else r("NO")
-    }
-    else{
-        while(c<a && a>0){
-            if(a-c==b-d) r("YES")
-            b += 5;
-            a--;
-        }
-        if(a-c == b-d && a>=c && b>=d) r("YES")
-        else r("NO")
-    }
+    int left = f(s, mx_index-1, v, dp);
+    int right = f(mx_index+1, e, v, dp);
+
+    return dp[s][e] = max(left, right) + 1;
 }
 
-int32_t main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    precalc();
+void solve() {
+	int n;
+	cin >> n;
+ 
+	vector<int> v(n);
+	vin(v)
+
+    vector<vector<int>> dp(n+1, vector<int>(n+1, -1));
+ 
+    r(f(0, n-1, v, dp));
+}
+ 
+int32_t main() {
+    ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0);
     int t = 1;
-    cin >> t;
-    while (t--){
-        solve();
-    }
+    // cin >> t;
+    while (t--) solve();
     return 0;
 }
